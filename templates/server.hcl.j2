@@ -44,4 +44,8 @@ authoritative_region = "{{ nomad_authoritative_region }}"
     encrypt = "{{ nomad_encrypt | default('') }}"
 
     raft_protocol = {{ nomad_raft_protocol }}
+
+    default_scheduler_config {
+      scheduler_algorithm = {{ nomad_scheduler_algorithm }}
+    }
 }
