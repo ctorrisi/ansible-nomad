@@ -46,6 +46,6 @@ authoritative_region = "{{ nomad_authoritative_region }}"
     raft_protocol = {{ nomad_raft_protocol }}
 
     default_scheduler_config {
-      scheduler_algorithm = {{ nomad_scheduler_algorithm }}
+      scheduler_algorithm = "{{ nomad_scheduler_algorithm }}"
     }
 }
