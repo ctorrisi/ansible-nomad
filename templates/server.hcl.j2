@@ -47,6 +47,6 @@ authoritative_region = "{{ nomad_authoritative_region }}"
 
     default_scheduler_config {
       scheduler_algorithm = "{{ nomad_scheduler_algorithm }}"
-      memory_oversubscription_enabled = "{{ nomad_memory_oversubscription_enabled | bool | lower }}"
+      memory_oversubscription_enabled = {{ nomad_memory_oversubscription_enabled | bool | lower }}
     }
 }
