@@ -89,6 +89,16 @@
   notify:
     - restart nomad
 
+- name: Remove Server configuration
+  file:
+    dest: "{{ nomad_config_dir }}/server.hcl"
+    state: absent
+  when:
+    - nomad_allow_purge_config | bool
+    - not _nomad_node_server | bool
+  notify:
+    - restart nomad
+
 - name: Client configuration
   template:
     src: client.hcl.j2
@@ -101,6 +111,16 @@
   notify:
     - restart nomad
 
+- name: Remove Client configuration
+  file:
+    dest: "{{ nomad_config_dir }}/client.hcl"
+    state: absent
+  when:
+    - nomad_allow_purge_config | bool
+    - not _nomad_node_client | bool
+  notify:
+    - restart nomad
+
 - name: Custom configuration
   template:
     src: custom.json.j2
@@ -110,6 +130,16 @@
     mode: 0644
   when:
     - nomad_config_custom is defined
+  notify:
+    - restart nomad
+
+- name: Remove custome configuration
+  file:
+    dest: "{{ nomad_config_dir }}/custom.json"
+    state: absent
+  when:
+    - nomad_allow_purge_config | bool
+    - nomad_config_custom is not defined
   notify:
     - restart nomad
 
@@ -149,18 +179,24 @@
     - not ansible_os_family == "Solaris"
   tags: skip_ansible_lint
 
-- name: systemd script
-  template:
-    src: nomad_systemd.service.j2
-    dest: /lib/systemd/system/nomad.service
-    owner: root
-    group: root
-    mode: 0644
-  when: ansible_service_mgr == "systemd"
-
-- name: reload systemd daemon
-  systemd:
-    daemon_reload: true
+- block:
+    - name: systemd script
+      template:
+        src: nomad_systemd.service.j2
+        dest: /lib/systemd/system/nomad.service
+        owner: root
+        group: root
+        mode: 0644
+      register: nomad_systemd_file
+    - block:
+      - name: reload systemd daemon
+        systemd:
+          daemon_reload: true
+      - name: Enable nomad at startup (systemd)
+        systemd:
+          name: nomad
+          enabled: yes
+      when: nomad_systemd_file.changed
   when: ansible_service_mgr == "systemd"
 
 - name: Start Nomad
@@ -168,3 +204,4 @@
     name: nomad
     enabled: true
     state: started
+  when: not ansible_service_mgr == "systemd"
