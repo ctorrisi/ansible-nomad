@@ -197,6 +197,10 @@
           name: nomad
           enabled: yes
       when: nomad_systemd_file.changed
+    - name: (Re)start Nomad
+      systemd:
+        name: nomad
+        state: restarted
   when: ansible_service_mgr == "systemd"
 
 - name: Start Nomad
