@@ -31,12 +31,6 @@ client {
         disk = {{ nomad_reserved['disk'] }}
     }
 
-{% for hn in nomad_host_networks %}
-    host_network "{{ hn['name'] }}" {
-        interface = "{{ hn['interface'] }}"
-    }
-{% endfor %}
-
 {% for nomad_host_volume in nomad_host_volumes %}
     host_volume "{{ nomad_host_volume['name'] }}" {
         path = "{{ nomad_host_volume['path'] }}"
